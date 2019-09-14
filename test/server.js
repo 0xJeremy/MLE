@@ -41,48 +41,60 @@ app.get('/', function(req, res) {
     res.render('./index.html');
 });
 
-var test = 0;
+// socket.on('search', (data) => {
+// 	search_item = data;
+// });
+var x = 0;
 
 socket.on('image', (data) => {
  	io.emit('image', data);
-
-
- 	if (x=0){
-	 	let subscriptionKey = process.env['COMPUTER_VISION_SUBSCRIPTION_KEY'];
-	 	let endpoint = process.env['COMPUTER_VISION_ENDPOINT']
+	x = x+ 1;
+ 	if(x % 10 == 0){
+ 		
+	 	let subscriptionKey = process.env['AZURE_KEY'];
+	 	let endpoint = process.env['AZURE_ENDPOINT'];
 	 	if (!subscriptionKey) { throw new Error('Set your environment variables for your subscription key and endpoint.'); }
-
+	 
 	 	var uriBase = endpoint + 'vision/v2.0/analyze';
 
-	 	const imageUrl =
-	 	    'https://upload.wikimedia.org/wikipedia/commons/3/3c/Shaki_waterfall.jpg';
+	 	// const imageUrl =
+	 	//     'https://upload.wikimedia.org/wikipedia/commons/3/3c/Shaki_waterfall.jpg';
 
 	 	// Request parameters.
 	 	const params = {
-	 	    'visualFeatures': 'Categories,Description,Color',
+	 	    'visualFeatures': 'Description,Tags',
 	 	    'details': '',
 	 	    'language': 'en'
 	 	};
 
+	 	var buf = Buffer.from(data, 'base64');
+	 	var search_item = "bottle";
+	 	// console.log("hi");
+	 	// console.log(buf);
+
 	 	const options = {
 	 	    uri: uriBase,
 	 	    qs: params,
-	 	    body: '{"url": ' + '"' + imageUrl + '"}',
+	 	    body: buf,
 	 	    headers: {
-	 	        'Content-Type': 'application/json',
+	 	        'Content-Type': 'application/octet-stream',
 	 	        'Ocp-Apim-Subscription-Key' : subscriptionKey
 	 	    }
 	 	};
 
+	 	// console.log(buf.toString());
+	 	console.log("Image sent");
 	 	request.post(options, (error, response, body) => {
 	 	  if (error) {
 	 	    console.log('Error: ', error);
 	 	    return;
 	 	  }
+
 	 	  let jsonResponse = JSON.stringify(JSON.parse(body), null, '  ');
 	 	  console.log('JSON Response\n');
 	 	  console.log(jsonResponse);
-	 	});
+
+	 	}); 
 	 }
 
 });
