@@ -94,6 +94,14 @@ socket.on('image', (data) => {
 	 	  console.log('JSON Response\n');
 	 	  console.log(jsonResponse);
 
+	 	  var tags=JSON.parse(body)['tags'];
+	 	  var hi_conf_objects = tags.filter(tag => tag.confidence > .8).map(tag=>tag.name);
+
+	 	  console.log(hi_conf_objects);
+	 	  if(hi_conf_objects.includes(search_item)){
+	 	  		console.log("Found a person");
+	 	  };
+
 	 	}); 
 	 }
 
