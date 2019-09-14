@@ -4,7 +4,7 @@ import sys
 import cv2
 from FireEye import FireEye
 
-socket = FireEye()
+socket = FireEye.FireEye()
 
 cap = cv2.VideoCapture(0) # Camera number goes here
 
@@ -16,8 +16,8 @@ ret, frame = cap.read()
 socket.writeImg(frame)
 
 count = 0
-while(True):
-	ret, frame = cap.read()
-	if count % 2:
-		socket.writeImg(frame)
-	count += 1
+# while(True):
+# 	ret, frame = cap.read()
+# 	if count % 2:
+# 		socket.writeImg(frame)
+# 	count += 1
