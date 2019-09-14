@@ -30,6 +30,7 @@ class Camera extends Component {
     super();
     this.state = {
       img: false,
+      rNum: props.rNum,
     };
     props.socket.on("image", data => this.setState({ img: data }));
   }

@@ -30,10 +30,10 @@ function Dashboard(props) {
     <div className={classes.root}>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
-          <Robot socket={socket} />
+          <Robot socket={socket} rNum={0} />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Robot socket={socket} />
+          <Robot socket={socket} rNum={1} />
         </Grid>
       </Grid>
     </div>

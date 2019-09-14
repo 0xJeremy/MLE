@@ -21,11 +21,17 @@ const useStyles = makeStyles(theme => ({
   body: {
     paddingTop: '0',
     paddingBottom: '0'
+  },
+  end: {
+    marginBottom: '40px',
   }
 }));
 
- function ManualControl() {
+function ManualControl(props) {
   const classes = useStyles();
+
+  const rNum = props.rNum;
+  const socket = props.socket;
 
   function Row1() {
     return (
@@ -79,7 +85,7 @@ const useStyles = makeStyles(theme => ({
   }
 
   return (
-    <Card>
+    <Card className={classes.end}>
       <CardHeader color="warning" icon>
         <CardIcon color="warning">
         <OpenWith />

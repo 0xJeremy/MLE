@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     borderWidth: '10px 2px 2px 2px',
     marginBottom: '16px',
     marginRight: '8px'
-  }
+  },
 }));
 
 function Robot(props) {
@@ -27,12 +27,13 @@ function Robot(props) {
 
   const socket = props.socket;
 
+  const rNum = props.rNum;
+
   return (
     <div>
-      <Camera socket={socket} />
-      <ManualControl />
-      <br />
-      <Status />
+      <Camera socket={socket} rNum={rNum} />
+      <ManualControl socket={socket} rNum={rNum} />
+      <Status socket={socket} rNum={rNum} />
     </div>
   );
 }
