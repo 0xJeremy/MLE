@@ -1,36 +1,21 @@
-from threading import Thread
-from FireEye import FireEye
 import cv2
-import base64
+from threading import Thread
 
 class vision(Thread):
 	def __init__(self, socket):
-		super(vision, self).__init__()
 		self.socket = socket
-		self.cap = cv2.VideoCapture(0)
-		self.cap.set(3, 640)
-		self.cap.set(4, 480)
-		self.capture = True
-		self.sendImg = True
-		self.endThread = False
-		self.run()
+		self.camera = cv2.VideoCapture(0)
+		self.camera.set(4, 640)
+		self.camera.set(4, 480)
+		self.count = 0
+		self.start()
 
 	def run(self):
-		while True:
-			if self.capture:
-				ret, frame = self.cap.read()
-				if self.sendImg:
-					self.socket.writeImg(self.encodeImg(frame))
-				self.sendImg = not self.sendImg
-			if self.endThread:
-				return
-
-	def setCapture(self, state):
-		self.capture = state
-
-	def encodeImg(self, img):
-		success, encoded_img = cv2.imencode('.jpg', img)
-		return base64.b64encode(encoded_img)
-
-	def exit(self):
-		self.endThread = True
+		while(True):
+			try:
+				ret, frame = self.camera.read()
+				if self.count % 2:
+					self.socket.writeImg(frame)
+				count += 1
+			except:
+				continue
