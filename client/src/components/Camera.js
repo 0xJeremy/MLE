@@ -9,6 +9,9 @@ const useStyles = makeStyles(theme => ({
 	},
 	loading: {
 		backgroundColor: '#000'
+	},
+	height: {
+		height: '480px'
 	}
 }));
 
@@ -17,36 +20,33 @@ function Loading() {
 	return (
 		<div>
 	    <Typography className={classes.type} variant="h3" gutterBottom>
-		  	<br /><br />// searching for camera //
+		  	<br /><br /><br />// seeking camera //
 		  </Typography>
 		  <LinearProgress className={classes.loading}/>
-		  <br /><br />
 	  </div>
 	)
 }
 
-class Camera extends Component {
-  constructor(props) {
-    super();
-    this.state = {
-      img: false,
-      rNum: props.rNum,
-    };
-    props.socket.on("image", data => this.setState({ img: data }));
-  }
+function Camera(props) {
+	const classes = useStyles();
+	const rNum = props.rNum;
+	const socket = props.socket;
+	const [img, setImg] = React.useState(false);
 
-  render() {
-  	return (
-  		<Container maxWidth="sm">
-				{this.state.img !== false &&
-					<img id='img' alt='' src={"data:image/png;base64,"+this.state.img} />
-				}
-      	{this.state.img === false &&
-      		<Loading />
-      	}
-    	</Container>
-  	)
-  } 
+	socket.on('image', (data) => {
+		setImg(data);
+	});
+
+	return (
+  	<Container className={classes.height} maxWidth="sm">
+			{img !== false &&
+				<img id='img' alt='' src={"data:image/png;base64,"+img} />
+			}
+     	{img === false &&
+     		<Loading />
+     	}
+    </Container>
+  )
 }
 
 export default Camera;
