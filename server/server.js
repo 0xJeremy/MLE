@@ -1,7 +1,11 @@
+'use strict';
+const language = require('@google-cloud/language');
+const request = require('request');
 const express = require('express');
-const FireEye = require();
+const FireEye = require('FireEye');
+const MLE = require('./MLE.js')
 
-var socket = new FireEye();
+var socket = new FireEye('127.0.0.1');
 
 console.log("FireEye address " + socket.getAddress() + " port " + socket.getPort());
 
@@ -32,10 +36,21 @@ app.use(function (req, res, next) {
 /// FRONT-END ENDPOINTS ///
 ///////////////////////////
 
-socket.on('image', (data) => {
-	io.emit('image', data);
+app.use('/', express.static(__dirname + '/'));
+
+app.get('/', function(req, res) {
+    res.render('./index.html');
 });
 
-socket.on('state', (data) => {
-	io.emit('state', data);
-});
+let myTest = new MLE(io, socket);
+
+// myTest.beginSearch();
+myTest.startFlow();
+
+
+
+
+
+
+
+
