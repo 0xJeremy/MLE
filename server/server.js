@@ -3,10 +3,11 @@ const language = require('@google-cloud/language');
 const request = require('request');
 const express = require('express');
 const FireEye = require('fireeye');
-const MLE = require('./MLE.js')
+var ip = require('ip');
+const MLE = require('./MLE.js');
 
-var socket1 = new FireEye('127.0.0.1', 8080);
-var socket2 = new FireEye('127.0.0.1', 9090)
+var socket1 = new FireEye(ip.address(), 8080);
+var socket2 = new FireEye(ip.address(), 9090);
 
 console.log("FireEye address " + socket1.getAddress() + " port " + socket1.getPort());
 console.log("FireEye address " + socket2.getAddress() + " port " + socket2.getPort());
@@ -48,14 +49,6 @@ app.use('/', express.static(__dirname + '/'));
 app.get('/', function(req, res) {
     res.render('./index.html');
 });
-
-io.on('connection', (ioSocket) => {
-	ioSocket.on('speech', (data) => {
-		ioSocket.emit('searchItem', 'apples')
-	})
-})
-
-
 
 var bot1 = new MLE(io, socket1, 1);
 var bot2 = new MLE(io, socket2, 2);

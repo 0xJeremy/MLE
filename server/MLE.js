@@ -6,7 +6,10 @@ const FireEye = require('fireeye');
 const Analyzer = require('./analyze.js');
 const RobotNav = require('./navControl.js');
 const GodMode = require('./god.js');
+const GenRobotInstruct = require('./genRobotInstructions.js');
 
+var SPEED = 75;
+var DURATION = 0.5;
 
 function MLE(io, socket, botNum) {
 	this.socket = socket;
@@ -14,9 +17,11 @@ function MLE(io, socket, botNum) {
 
 	this.rNum = botNum
 
-	this.search_item = 'person';
+	this.searchItem = 'person';
 	this.nav = new RobotNav(botNum);
-	this.nav.setState('STOPPED')
+	this.nav.setState('STOPPED');
+
+	this.ioSocket = null;
 
 	this.godmode = new GodMode(io, socket);
 
@@ -30,26 +35,58 @@ function MLE(io, socket, botNum) {
 		console.log('Bot ' + this.rNum + ': ' + message);
 	}
 
-
 	this.io.on('connection', (ioSocket) => {
 
+		this.ioSocket = ioSocket;
+
 		ioSocket.on('speech', (data) => {
-			this.analyzer.textAnalysis(data)
+			this.textAnalysis(data)
 				.then(item => {
-					this.search_item = item;
-					ioSocket.emit('searchItem',item);
+					this.searchItem = item;
+					ioSocket.emit('searchItem', item);
 				})
 				.catch(console.error);
 		});
 
 		ioSocket.on('confirmItem', (data) => {
-			this.beginSearch();
 			if(JSON.parse(data)['response'] && !this.godmodeOn){
 				this.nav.setState('SEARCHING');
-				console.log('Rollout!!!');
+				this.report('Rollout!!!');
 			}
 		});
+
+		ioSocket.on('manual'+this.rNum, (data) => {
+			this.report('Got command: ' + data)
+			var cmd = ''
+			if(data == 'FORWARD') {cmd = GenRobotInstruct.genForward(SPEED, DURATION);}
+			if(data == 'LEFT') {cmd = GenRobotInstruct.genLeft(-SPEED, DURATION/4);}
+			if(data == 'RIGHT') {cmd = GenRobotInstruct.genRight(SPEED,DURATION/4);}
+			if(data == 'BACK') {cmd = GenRobotInstruct.genBack(SPEED, DURATION);}
+			socket.write('instructions', cmd);
+		});
 	});
+
+	this.textAnalysis = async function(data){
+
+		// Instantiates a client
+		const client = new language.LanguageServiceClient();
+
+		// The text to analyze
+		const text = data;
+
+		const document = {
+			content: text,
+		 	type: 'PLAIN_TEXT',
+		};
+
+		// Detects the entities of the text
+		const [result] = await client.analyzeEntities({document: document});
+		const entities = result.entities;
+		const item = entities[0].name;
+
+		return item;
+
+	};
 
 	this.socket.on('image', (data) => {
 	 	this.io.emit('image'+this.rNum, data);
@@ -89,12 +126,13 @@ function MLE(io, socket, botNum) {
 
 			  var tags=JSON.parse(body)['tags'];
 			  var hi_conf_objects = tags.filter(tag => tag.confidence > .8).map(tag=>tag.name);
-			  this.report(hi_conf_objects);
+			  this.report("Objects: " + hi_conf_objects);
+			  if(JSON.parse(body)['description']['captions'][0] != undefined) {
+	    		  this.description = JSON.parse(body)['description']['captions'][0].text;
+			  }
 
-			  this.description = JSON.parse(body)['description']['captions'][0].text;
-
-			  if(hi_conf_objects.includes(this.search_item)){
-			  		this.report("Found a " + this.search_item);
+			  if(hi_conf_objects.includes(this.searchItem)){
+			  		this.report("Found a " + this.searchItem);
 			  		this.found = true;
 			  		this.nav.setState('FOUND')
 		  			this.finale();
@@ -108,7 +146,7 @@ function MLE(io, socket, botNum) {
 	this.socket.on('cmdAck', (data) => {
 		cmd = this.nav.getCmd();
 		this.report("Sending instruction " + cmd)
-		this.socket.write('instruction', cmd);
+		this.socket.write('instructions', cmd);
 	});
 
 	this.actiavteGM = function(){
@@ -117,6 +155,7 @@ function MLE(io, socket, botNum) {
 	}
 
 	this.finale = function(){
+		this.ioSocket.emit('found', this.description);
 		this.report('Done!');
 	}
 

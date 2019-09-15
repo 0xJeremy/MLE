@@ -16,6 +16,6 @@ class vision(Thread):
 		while(True):
 			ret, frame = self.camera.read()
 			if self.count % 2:
-				img = cv2.flip(frame, 1)
+				img = cv2.flip(frame, 0)
 				self.socket.writeImg(img)
 			self.count += 1

@@ -1,6 +1,9 @@
 'use strict';
 const GenRobotInstruct = require('./genRobotInstructions.js');
 
+var SPEED = 75;
+var DURATION = 0.5;
+
 function RobotNav(botNum) {
 
 	this.STATES = {
@@ -33,19 +36,19 @@ function RobotNav(botNum) {
 		if(this.CURR_STATE == this.STATES.SEARCHING) {
 			cmd = '';
 			if(this.searchCounter == 0) {
-				cmd = GenRobotInstruct.genForward(speed, duration);
+				cmd = GenRobotInstruct.genForward(SPEED, DURATION);
 			}
 			else if(this.searchCounter == 1) {
-				cmd = GenRobotInstruct.genLeft(-speed, duration);
+				cmd = GenRobotInstruct.genLeft(-SPEED, DURATION);
 			}
 			else if(this.searchCounter == 2) {
-				cmd = GenRobotInstruct.genRight(speed,duration);
+				cmd = GenRobotInstruct.genRight(SPEED,DURATION);
 			}
 			else if(this.searchCounter == 3) {
-				cmd = GenRobotInstruct.genRight(speed, duration)
+				cmd = GenRobotInstruct.genRight(SPEED, DURATION)
 			}
 			else if(this.searchCounter == 4) {
-				cmd = GenRobotInstruct.genLeft(-speed, duration)
+				cmd = GenRobotInstruct.genLeft(-SPEED, DURATION)
 			}
 			this.searchCounter += 1
 			if(this.searchCounter > 4) {

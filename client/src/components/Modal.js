@@ -89,6 +89,12 @@ function Modal(props) {
     setSearchItem(data);
   });
 
+  socket.on('found', (data) => {
+    setRecordModal(false);
+    setLoadingModal(false);
+    setConfirmModal(false);
+  })
+
   return (
     <div>
       <Button onClick={openRecord} variant="contained" color="success" className={classes.record} fullWidth>

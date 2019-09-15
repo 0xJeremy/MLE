@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import FoundModal from './FoundModal.js'
 
 const useStyles = makeStyles(theme => ({
 	type: {
@@ -32,10 +33,21 @@ function Camera(props) {
 	const rNum = props.rNum;
 	const socket = props.socket;
 	const [img, setImg] = React.useState(false);
+	const [modal, setModal] = React.useState(false);
+	const [description, setDesc] = React.useState(null);
 
 	socket.on('image'+rNum, (data) => {
 		setImg(data);
 	});
+
+	socket.on('found', (data) => {
+		setDesc(data);
+		setModal(true);
+	});
+
+	const close = () => {
+		setModal(false);
+	}	
 
 	return (
   	<Container className={classes.height} maxWidth="sm">
@@ -45,6 +57,7 @@ function Camera(props) {
      	{img === false &&
      		<Loading />
      	}
+     	<FoundModal state={modal} close={close} description={description}/>
     </Container>
   )
 }

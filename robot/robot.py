@@ -52,6 +52,7 @@ class Robot():
 					self.eStop()
 					return
 				self.interpret(data)
+				self.socket.write('cmdAck', True);
 			except:
 				error('Error encountered in main run loop.')
 				continue
