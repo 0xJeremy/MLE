@@ -2,7 +2,7 @@
 const language = require('@google-cloud/language');
 const request = require('request');
 const express = require('express');
-const FireEye = require('FireEye');
+const FireEye = require('fireeye');
 const Analyzer = require('./analyze.js');
 const RobotNav = require('./navControl.js');
 const GodMode = require('./god.js');
@@ -68,10 +68,10 @@ class MLE{
 
 	}
 	
-	actiavteGM(){
+	activateGM(){
 		this.godmode.godControl();
 		this.godmodeOn=true;
-		this.nav.autobots_stop();
+		// this.nav.autobots_stop();
 	}
 
 }

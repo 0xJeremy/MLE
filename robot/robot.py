@@ -3,6 +3,7 @@
 import sys
 from FireEye import FireEye
 from time import sleep
+from json import loads as stringToDict
 from driver import motors, MAX_SPEED
 from imaging import vision
 
@@ -27,6 +28,7 @@ DRIFT     = 'drift'
 DIRECTION = 'direction'
 ACTION    = 'action'
 TIME      = 'time'
+TURN      = 'turn'
 CMD       = 'cmd'
 
 def scaleSpeed(speed):
@@ -35,13 +37,17 @@ def scaleSpeed(speed):
 class Robot():
 	def __init__(self, socket):
 		self.socket = socket
-		self.vision = vision(socket)
+		# self.vision = vision(socket)
 		self.motors = motors
 
 	def run(self):
 		while True:
 			try:
 				data = self.socket.get('instructions')
+				if(data == None):
+					continue
+				self.socket.channels['instructions'] = None
+				data = stringToDict(data)
 				if data == 'QUIT':
 					self.eStop()
 					return
@@ -51,6 +57,8 @@ class Robot():
 				continue
 
 	def interpret(self, i):
+		print(i)
+		print(i[CMD])
 		try:
 			cmd = i[CMD]
 			if  cmd == ESTOP: self.eStop()
@@ -73,17 +81,17 @@ class Robot():
 			self.stop()
 
 	def move(self, speed):
-		self.motors.motor1.setSpeed(speed)
+		self.motors.motor1.setSpeed(-speed)
 		self.motors.motor2.setSpeed(speed)
 		report('Move', speed)
 
 	def turn(self, speed):
-		self.motors.motor1.setSpeed(speed)
+		self.motors.motor1.setSpeed(-speed)
 		self.motors.motor2.setSpeed(-speed)
 		report('Turn', speed)
 
 	def manual(self, left, right):
-		self.motors.motor1.setSpeed(left)
+		self.motors.motor1.setSpeed(-left)
 		self.motors.motor2.setSpeed(right)
 		report('Manual', 'left:{}, right:{}'.format(left, right))
 
@@ -118,10 +126,10 @@ class Robot():
 		report('Performing Nod', None)
 
 def main(god=False):
-	socket = FireEye.FireEye(addr='127.0.0.1', port=80)
-
+	socket = FireEye.FireEye(addr='192.168.137.158', port=8080)
+	print("FireEye Connected")
 	bot = Robot(socket)
-
+	print("Robot about to run")
 	bot.run()
 
 

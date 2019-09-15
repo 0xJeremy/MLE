@@ -3,6 +3,7 @@ from threading import Thread
 
 class vision(Thread):
 	def __init__(self, socket):
+		super(vision, self).__init__()
 		self.socket = socket
 		self.camera = cv2.VideoCapture(0)
 		self.camera.set(4, 640)

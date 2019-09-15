@@ -2,7 +2,7 @@
 const language = require('@google-cloud/language');
 const request = require('request');
 const express = require('express');
-const FireEye = require('FireEye');
+const FireEye = require('fireeye');
 
 
 

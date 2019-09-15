@@ -2,8 +2,8 @@
 const language = require('@google-cloud/language');
 const request = require('request');
 const express = require('express');
-const FireEye = require('FireEye');
-const GenRobotInstruct = require('./GenRobotInstructions.js');
+const FireEye = require('fireeye');
+const GenRobotInstruct = require('./genRobotInstructions.js');
 
 // console.log("FireEye address " + socket.getAddress() + " port " + socket.getPort());
 
@@ -60,6 +60,7 @@ class RobotNav {
 
 
 	autobots_stop(){
+		console.log(this.robot_socket);
 		this.robot_socket.write('instructions', GenRobotInstruct.genStop());
 		this.command_queue = [];
 		this.CURR_STATE = this.STATES.STOPPED;

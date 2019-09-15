@@ -2,10 +2,10 @@
 const language = require('@google-cloud/language');
 const request = require('request');
 const express = require('express');
-const FireEye = require('FireEye');
+const FireEye = require('fireeye');
 const MLE = require('./MLE.js')
 
-var socket = new FireEye('127.0.0.1');
+var socket = new FireEye();
 
 console.log("FireEye address " + socket.getAddress() + " port " + socket.getPort());
 
@@ -43,9 +43,10 @@ app.get('/', function(req, res) {
 });
 
 let myTest = new MLE(io, socket);
+myTest.activateGM();
 
 // myTest.beginSearch();
-myTest.startFlow();
+// myTest.startFlow();
 
 
 
