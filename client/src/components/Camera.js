@@ -33,7 +33,7 @@ function Camera(props) {
 	const socket = props.socket;
 	const [img, setImg] = React.useState(false);
 
-	socket.on('image', (data) => {
+	socket.on('image'+rNum, (data) => {
 		setImg(data);
 	});
 

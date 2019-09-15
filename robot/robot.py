@@ -37,7 +37,7 @@ def scaleSpeed(speed):
 class Robot():
 	def __init__(self, socket):
 		self.socket = socket
-		# self.vision = vision(socket)
+		self.vision = vision(socket)
 		self.motors = motors
 
 	def run(self):
@@ -86,8 +86,8 @@ class Robot():
 		report('Move', speed)
 
 	def turn(self, speed):
-		self.motors.motor1.setSpeed(-speed)
-		self.motors.motor2.setSpeed(-speed)
+		self.motors.motor1.setSpeed(speed)
+		self.motors.motor2.setSpeed(speed)
 		report('Turn', speed)
 
 	def manual(self, left, right):
@@ -98,7 +98,7 @@ class Robot():
 	def stop(self):
 		self.motors.motor1.setSpeed(0)
 		self.motors.motor2.setSpeed(0)
-		report('Normal Stop', None)
+		report('Normal Stop', None, None)
 
 	def eStop(self):
 		self.motors.forceStop()

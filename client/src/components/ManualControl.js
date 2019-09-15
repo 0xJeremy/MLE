@@ -51,7 +51,7 @@ function ManualControl(props) {
   };
 
   function press(direction) {
-    socket.emit('manual', {"direction": direction});
+    socket.emit('manual'+rNum, {"direction": direction});
     console.log("Going " + direction);
   }
 
