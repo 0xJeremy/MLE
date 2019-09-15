@@ -4,11 +4,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import Button from "./packs/Button.js";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
   root: {
@@ -37,6 +36,12 @@ const useStyles = makeStyles(theme => ({
   },
   search: {
     color: ''
+  },
+  progress: {
+    margin: theme.spacing(4),
+  },
+  title: {
+    marginRight: '100px',
   }
 }));
 
@@ -60,42 +65,27 @@ const DialogContent = withStyles(theme => ({
   },
 }))(MuiDialogContent);
 
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
-
-function ConfirmModal(props) {
+function LoadingModal(props) {
   const classes = useStyles();
   const state = props.state;
-  const again = props.again;
-  const confirm = props.confirm;
   const cancel = props.cancel;
-  const text = props.text;
 
   return (
     <div>
       <Dialog onClose={cancel} aria-labelledby="customized-dialog-title" open={state}>
-        <DialogTitle id="customized-dialog-title" onClose={cancel}>
-          Confirm Object
+        <DialogTitle id="customized-dialog-title" onClose={cancel} >
+          <Typography className={classes.title}>
+            Processing Speech
+          </Typography>
         </DialogTitle>
         <DialogContent dividers>
-          <Typography className={classes.prompt} align="center" gutterBottom>
-            Is the following object correct?
-          </Typography>
-          <Typography className={classes.search} align="center" gutterBottom>
-            {text}
+          <Typography align="center" gutterBottom>
+            <CircularProgress className={classes.progress} />
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button color="danger" onClick={again}>Try Again</Button>
-          <Button color="success" onClick={confirm}>Confirm!</Button>
-        </DialogActions>
       </Dialog>
     </div>
   );
 }
 
-export default ConfirmModal;
+export default LoadingModal;

@@ -7,7 +7,6 @@ import ChevronLeft from "@material-ui/icons/ChevronLeft";
 import ChevronRight from "@material-ui/icons/ChevronRight";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import GridItem from "./packs/GridItem.js";
 import Card from "./packs/Card.js";
 import CardBody from "./packs/CardBody.js";
 import CardHeader from "./packs/CardHeader.js";

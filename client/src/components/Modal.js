@@ -1,29 +1,10 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
 import { makeStyles } from "@material-ui/core/styles";
-import Dialog from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
-import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Typography from '@material-ui/core/Typography';
 import Button from "./packs/Button.js";
-import Mic from "@material-ui/icons/Mic";
-import Microphone from './Microphone';
-
-const styles = theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(2),
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-});
+import RecordingModal from './RecordingModal';
+import ConfirmModal from './ConfirmModal';
+import LoadingModal from './LoadingModal';
+import SpeechRecognition from "react-speech-recognition";
 
 const useStyles = makeStyles(theme => ({
   record: {
@@ -42,122 +23,76 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const DialogTitle = withStyles(styles)(props => {
-  const { children, classes, onClose } = props;
-  return (
-    <MuiDialogTitle disableTypography className={classes.root}>
-      <Typography variant="h6">{children}</Typography>
-      {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </MuiDialogTitle>
-  );
-});
-
-const DialogContent = withStyles(theme => ({
-  root: {
-    padding: theme.spacing(2),
-  },
-}))(MuiDialogContent);
-
-const DialogActions = withStyles(theme => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
 
 function Modal(props) {
+  const transcript = props.transcript;
+  const resetTranscript = props.resetTranscript;
+  const startListening = props.startListening;
+  const stopListening = props.stopListening;
+
   const classes = useStyles();
   const socket = props.socket;
-  const [open1, setOpen] = React.useState(false);
-  const [open2, setOpen2] = React.useState(false);
-  const [string, setString] = React.useState('');
-  const [recording, setRecording] = React.useState(false);
-  const [search, setSearch] = React.useState('');
 
-  socket.on('confirm', (data) => {
-    setSearch(data);
-  })
+  const [recordModal, setRecordModal] = React.useState(false);
+  const [confirmModal, setConfirmModal] = React.useState(false);
+  const [loadingModal, setLoadingModal] = React.useState(false);
+  const [text, setText] = React.useState('');
+  const [searchItem, setSearchItem] = React.useState(null);
 
-  const useTranscript = (transcript) => {
-    setString(transcript);
-  };
-
-  const handleClickOpen = () => {
-    setRecording(true);
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const askConfirm = () => {
-    setOpen(false);
-    setOpen2(true);
-  };
-
-  const closeSecond = () => {
-    setOpen2(false);
+  const openRecord = () => {
+    startListening();
+    setRecordModal(true);
   }
 
-  const openSecond = () => {
-    setOpen2(true);
+  const cancelRecord = () => {
+    stopListening();
+    setRecordModal(false);
+    resetTranscript();
   }
+
+  const closeRecord = () => {
+    stopListening();
+    setRecordModal(false);
+    setLoadingModal(true);
+    socket.emit('speech', transcript)
+  }
+
+  const cancelConfirm = () => {
+    setConfirmModal(false);
+    resetTranscript();
+  }
+
+  const tryAgain = () => {
+    setConfirmModal(false);
+    openRecord();
+  }
+
+  const confirm = () => {
+    setConfirmModal(false);
+    socket.emit('confirmItem', true);
+  }
+
+  const closeLoading = () => {
+    setLoadingModal(false);
+    resetTranscript();
+  }
+
+  socket.on('searchItem', (data) => {
+    setLoadingModal(false);
+    setConfirmModal(true);
+    setSearchItem(data);
+  });
 
   return (
     <div>
-      <Button onClick={handleClickOpen} variant="contained" color="success" className={classes.record} fullWidth>
+      <Button onClick={openRecord} variant="contained" color="success" className={classes.record} fullWidth>
         Find An Object!
       </Button>
-        {search == '' &&
-          <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open1}>
-            <DialogTitle id="customized-dialog-title" onClose={handleClose}>
-              Find Object
-            </DialogTitle>
-            <DialogContent dividers>
-              <Typography className={classes.prompt} align="center" gutterBottom>
-                What would you like to find?
-              </Typography>
-              <Typography align="center" gutterBottom>
-                <Mic className={classes.mic}/>
-              </Typography>
-              {string != '' && 
-                <Typography align="center" gutterBottom>
-                  {string}
-                </Typography>
-              }
-            </DialogContent>
-            <DialogActions>
-                <Microphone report={setString} recording={recording} close={askConfirm}/>
-            </DialogActions>
-          </Dialog>
-        }
-        {search != '' &&
-          <Dialog onClose={openSecond} aria-labelledby="customized-dialog-title" open={open2}>
-            <DialogTitle id="customized-dialog-title" onClose={openSecond}>
-              Confirm Object
-            </DialogTitle>
-            <DialogContent dividers>
-              <Typography className={classes.prompt} align="center" gutterBottom>
-                Is the following object correct?
-              </Typography>
-              <Typography className={classes.search} align="center" gutterBottom>
-                {search}
-              </Typography>
-            </DialogContent>
-            <DialogActions>
-              <Button color="primary" onClick={closeSecond}>Try Again</Button>
-              <Button color="primary" onClick={closeSecond}>Confirm!</Button>
-            </DialogActions>
-          </Dialog>
-        }
-        
-      
+      <RecordingModal state={recordModal} close={closeRecord} cancel={cancelRecord}/>
+      <LoadingModal state={loadingModal} cancel={closeLoading}/>
+      <ConfirmModal state={confirmModal} cancel={cancelConfirm} again={tryAgain} confirm={confirm} text={searchItem}/>
     </div>
   );
 }
 
-export default Modal;
+export default SpeechRecognition(Modal);
