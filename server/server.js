@@ -47,6 +47,14 @@ app.get('/', function(req, res) {
     res.render('./index.html');
 });
 
+io.on('connection', (ioSocket) => {
+	ioSocket.on('speech', (data) => {
+		ioSocket.emit('searchItem', 'apples')
+	})
+})
+
+
+
 let myTest = new MLE(io, socket);
 
 myTest.startFlow();

@@ -1,89 +1,69 @@
 'use strict';
-const language = require('@google-cloud/language');
-const request = require('request');
-const express = require('express');
-const FireEye = require('fireeye');
 const GenRobotInstruct = require('./genRobotInstructions.js');
 
-// console.log("FireEye address " + socket.getAddress() + " port " + socket.getPort());
+function RobotNav() {
+
+	this.STATES = {
+		STOPPED: 'Stopped',
+		SEARCHING: 'Searching',
+		BACKTRACKING: 'Backtracking',
+		FOUND: 'Found'
+	}
+
+	this.CURR_STATE = this.STATES.STOPPED;
+
+	this.error = false;
 
 
-class RobotNav {
+	this.history = [];
 
-	constructor(socket){
-		this.robot_socket = socket;
+	this.searchCounter = 0;
 
-		this.STATES = {
-			STOPPED: 'Stopped',
-			SEARCHING: 'Searching',
-			BACKTRACKING: 'Backtracking',
-			FOUND: 'Found'
+	this.setState = function(state) {
+		this.CURR_STATE = this.STATES[state];
+		console.log("Nav State set to " + this.CURR_STATE);
+	}
+
+	this.getCmd = function() {
+		if(this.CURR_STATE == this.STATES.STOPPED) {
+			return GenRobotInstruct.getStop();
 		}
-
-		this.CURR_STATE = this.STATES.STOPPED;
-
-		this.error = false;
-
-		this.command_queue = [];
-
-	}
-
-	autobots_rollout(){
-		if(this.CURR_STATE != this.STATES.STOPPED){
-			// socket.emit('instructions',GenRobotInstruct.genStop());
-			this.CURR_STATE = this.STATES.STOPPED;
+		if(this.CURR_STATE == this.STATES.SEARCHING) {
+			cmd = '';
+			if(this.searchCounter == 0) {
+				cmd = GenRobotInstruct.genForward(speed, duration);
+			}
+			else if(this.searchCounter == 1) {
+				cmd = GenRobotInstruct.genLeft(-speed, duration);
+			}
+			else if(this.searchCounter == 2) {
+				cmd = GenRobotInstruct.genRight(speed,duration);
+			}
+			else if(this.searchCounter == 3) {
+				cmd = GenRobotInstruct.genRight(speed, duration)
+			}
+			else if(this.searchCounter == 4) {
+				cmd = GenRobotInstruct.genLeft(-speed, duration)
+			}
+			this.searchCounter += 1
+			if(this.searchCounter > 4) {
+				this.searchCounter = 0;
+			}
+			if(this.history.length >= 5) {
+				this.history.shift();
+			}
+			this.history.push(cmd);
+			return cmd;
 		}
-
-		var i = 0;
-		while(i < 1 && !this.error){
-			this.autobots_search();
-			i++;
+		if(this.CURR_STATE == this.STATES.BACKTRACKING) {
+			if(this.searchCounter.length > 0) {
+				return this.searchCounter.pop();
+			}
+			return GenRobotInstruct.getStop();
 		}
-	}
-
-	autobots_run(){
-
-		var com = this.command_queue.pop();
-
-		if(!com) return;
-
-		if(this.error) return;
-
-		const wait = 1000 * JSON.parse(com)['time'];
-		console.log(wait);
-		console.log(com);
-		this.robot_socket.write('instructions',com);
-
-		setTimeout(()=>this.autobots_run(), wait);
-	}
-
-
-	autobots_stop(){
-		this.robot_socket.write('instructions', GenRobotInstruct.genStop());
-		this.command_queue = [];
-		this.CURR_STATE = this.STATES.STOPPED;
-	}
-
-	autobots_search(){
-
-		this.CURR_STATE = this.STATES.SEARCHING;
-		const speed = 25;
-		const duration = 4
-
-	 	this.command_queue.push(GenRobotInstruct.genForward(speed, duration), // Move forward
-	 										GenRobotInstruct.genLeft(-speed, duration), // Center
-	 										GenRobotInstruct.genRight(speed,duration), // Look right
-	 										GenRobotInstruct.genRight(speed, duration), // Center
-	 										GenRobotInstruct.genLeft(-speed, duration), //Look left
-	 										);
-	 	this.autobots_run();
-	}
-
-	autobots_backtrack(){
-		const speed = 25;
-		const duration = 4;
-
-		this.command_queue.push(GenRobotInstruct.genBack(-speed, 2));
+		if(this.CURR_STATE == this.STATES.FOUND) {
+			return GenRobotInstruct.getStop();
+		}
 	}
 }
 
