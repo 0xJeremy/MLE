@@ -12,7 +12,6 @@ class RobotNav {
 
 	constructor(socket){
 		this.robot_socket = socket;
-		this.robot_socket.emit('test', "hi");
 
 		this.STATES = {
 			STOPPED: 'Stopped',
@@ -53,7 +52,7 @@ class RobotNav {
 		const wait = 1000 * JSON.parse(com)['time'];
 		console.log(wait);
 		console.log(com);
-		this.robot_socket.emit('instructions',com);
+		this.robot_socket.write('instructions',com);
 
 		setTimeout(()=>this.autobots_run(), wait);
 		return;
@@ -61,17 +60,16 @@ class RobotNav {
 
 
 	autobots_stop(){
-		this.robot_socket.emit('instructions', GenRobotInstruct.genStop());
+		this.robot_socket.write('instructions', GenRobotInstruct.genStop());
 		this.command_queue = [];
 		this.CURR_STATE = this.STATES.STOPPED;
-
 	}
 
 	autobots_search(){
 
 		this.CURR_STATE = this.STATES.SEARCHING;
 		const speed = 25;
-		const duration = 2
+		const duration = 4
 
 	 	this.command_queue.push(GenRobotInstruct.genForward(speed, duration), // Move forward
 	 										GenRobotInstruct.genLeft(-speed, duration), // Center
@@ -84,7 +82,7 @@ class RobotNav {
 
 	autobots_backtrack(){
 		const speed = 25;
-		const duration = 2;
+		const duration = 4;
 
 		this.command_queue.push(GenRobotInstruct.genBack(-speed, 2));
 	}
