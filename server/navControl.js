@@ -55,12 +55,10 @@ class RobotNav {
 		this.robot_socket.write('instructions',com);
 
 		setTimeout(()=>this.autobots_run(), wait);
-		return;
 	}
 
 
 	autobots_stop(){
-		console.log(this.robot_socket);
 		this.robot_socket.write('instructions', GenRobotInstruct.genStop());
 		this.command_queue = [];
 		this.CURR_STATE = this.STATES.STOPPED;

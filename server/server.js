@@ -5,7 +5,7 @@ const express = require('express');
 const FireEye = require('fireeye');
 const MLE = require('./MLE.js')
 
-var socket = new FireEye();
+var socket = new FireEye('127.0.0.1');
 
 console.log("FireEye address " + socket.getAddress() + " port " + socket.getPort());
 
@@ -36,6 +36,11 @@ app.use(function (req, res, next) {
 /// FRONT-END ENDPOINTS ///
 ///////////////////////////
 
+
+socket.on('test', data=>{
+	console.log(data);
+});
+
 app.use('/', express.static(__dirname + '/'));
 
 app.get('/', function(req, res) {
@@ -43,10 +48,8 @@ app.get('/', function(req, res) {
 });
 
 let myTest = new MLE(io, socket);
-myTest.activateGM();
 
-// myTest.beginSearch();
-// myTest.startFlow();
+myTest.startFlow();
 
 
 

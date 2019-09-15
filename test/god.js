@@ -11,6 +11,8 @@ class GodMode {
 		this.io.on('connection', (ioSocket) => {
 			ioSocket.on('manual', (data) => {
 
+				console.log("Data: " + data);
+
 				var direction = data['direction'];
 				var duration = data['time']; //default 1s
 				var speed = data['speed']; //default 50% speed
@@ -41,11 +43,13 @@ class GodMode {
 						console.error('Invalid manual command sent to server!\n');
 				}
 
-				if(instruct) this.socket.emit('instructions', instruct);
+				console.log("Instruction: " + instruct);
+
+				this.socket.write('instructions', instruct);
 
 			});
 		});
 	}
 }
 
-module.exports = godControl;
+module.exports = GodMode;
