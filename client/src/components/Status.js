@@ -52,13 +52,6 @@ function Status(props) {
 
                 <TableRow>
                   <TableCell component="th" scope="row">
-                    Device Name
-                  </TableCell>
-                  <TableCell align="right">Raspberry Pi</TableCell>
-                </TableRow>
-
-                <TableRow>
-                  <TableCell component="th" scope="row">
                     IPv4 Address
                   </TableCell>
                   <TableCell align="right">{ip}</TableCell>

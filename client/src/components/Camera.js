@@ -17,7 +17,7 @@ function Loading() {
 	return (
 		<div>
 	    <Typography className={classes.type} variant="h3" gutterBottom>
-		  	<br /><br />// searching for camera //
+		  	<br /><br />// seeking camera //
 		  </Typography>
 		  <LinearProgress className={classes.loading}/>
 		  <br /><br />
