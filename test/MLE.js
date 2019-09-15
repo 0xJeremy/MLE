@@ -61,11 +61,11 @@ class MLE{
 	beginSearch(){
 		// this.nav.autobots_rollout();
 		var x = 0;
+		var found = false;
 		this.socket.on('image', (data) => {
 		 	this.io.emit('image', data);
 			
-			
-		 	if(x == 0){
+		 	if(x % 50 == 0 && !found){
 
 				let subscriptionKey = process.env['AZURE_KEY'];
 				let endpoint = process.env['AZURE_ENDPOINT'];
@@ -92,7 +92,6 @@ class MLE{
 				};
 
 				var description;
-				var found;
 				
 				request.post(options, (error, response, body) => {
 				  if (error) {
@@ -103,22 +102,23 @@ class MLE{
 				  let jsonResponse = JSON.stringify(JSON.parse(body), null, '  ');
 
 				  var tags=JSON.parse(body)['tags'];
+
 				  var hi_conf_objects = tags.filter(tag => tag.confidence > .8).map(tag=>tag.name);
 				  console.log(hi_conf_objects);
 
-				  var description = JSON.parse(body)['description']['captions'][0].text;
+				  if(JSON.parse(body)['description']['captions'][0]){
+				  	var description = JSON.parse(body)['description']['captions'][0].text;
+				  	var confidence = JSON.parse(body)['description']['captions'][0].confidence;
+				  }
 
-				  if(hi_conf_objects.includes(this.search_item) || true){
+				  if( hi_conf_objects.reduce((acc,curr)=>{return acc || curr.includes(this.search_item)}, false)){
 				  		console.log("Found a " + this.search_item);
 			  			this.nav.autobots_stop();
-			  			this.finale();
+			  			this.finale(description,confidence);
+			  			found = true;
 				  }
 
 				});
-
-				// console.log("PRINTING");
-				// console.log(this.description);
-				// console.log(this.found);
 			}
 			x += 1;
 
@@ -132,8 +132,10 @@ class MLE{
 		// this.nav.autobots_stop();
 	}
 
-	finale(){
+	finale(description,confidence){
 		console.log('Done!');
+		console.log(`{"description": ${description}, "confidence": ${confidence}}`);
+		this.io.emit('completed',`{"description": ${description}, "confidence": ${confidence}}`);
 	}
 
 }

@@ -25,29 +25,26 @@ class RobotNav {
 		this.error = false;
 
 		this.command_queue = [];
+		this.runDone = false;
 
 	}
 
 	autobots_rollout(){
 		if(this.CURR_STATE != this.STATES.STOPPED){
 			// socket.emit('instructions',GenRobotInstruct.genStop());
-			this.CURR_STATE = this.STATES.STOPPED;
+			this.autobots_stop();
 		}
+		this.autobots_search();
 
-		var i = 0;
-		while(i < 1 && !this.error){
-			this.autobots_search();
-			i++;
-		}
 	}
 
 	autobots_run(){
 
 		var com = this.command_queue.pop();
 
-		if(!com) return;
+		if(!com) return true;
 
-		if(this.error) return;
+		if(this.error) return 0;
 
 		const wait = 1000 * JSON.parse(com)['time'];
 		console.log(wait);
@@ -70,12 +67,33 @@ class RobotNav {
 		const speed = 25;
 		const duration = 4
 
-	 	this.command_queue.push(GenRobotInstruct.genForward(speed, duration), // Move forward
-	 										GenRobotInstruct.genLeft(-speed, duration), // Center
-	 										GenRobotInstruct.genRight(speed,duration), // Look right
-	 										GenRobotInstruct.genRight(speed, duration), // Center
-	 										GenRobotInstruct.genLeft(-speed, duration), //Look left
-	 										);
+		var new_instruct = Math.floor(Math.random() * Math.floor(4));
+
+		switch(new_instruct){
+			case 0:
+				this.command_queue.push(GenRobotInstruct.genLeft(speed, duration));
+				break;
+			case 1:
+				this.command_queue.push(GenRobotInstruct.genRight(speed, duration));
+				break;
+
+			case 2:
+				this.command_queue.push(GenRobotInstruct.genForward(speed, duration));
+				break;
+
+			case 3:
+				this.command_queue.push(GenRobotInstruct.genBack(speed, duration));
+				break;
+
+			default:
+			 	this.command_queue.push(GenRobotInstruct.genForward(speed, duration), // Move forward
+			 										GenRobotInstruct.genLeft(-speed, duration), // Center
+			 										GenRobotInstruct.genRight(speed,duration), // Look right
+			 										GenRobotInstruct.genRight(speed, duration), // Center
+			 										GenRobotInstruct.genLeft(-speed, duration), //Look left
+			 										);
+			 	break;
+		}
 	 	this.autobots_run();
 	}
 
