@@ -8,7 +8,7 @@ import SpeechRecognition from "react-speech-recognition";
 
 const useStyles = makeStyles(theme => ({
   record: {
-    height: '45%',
+    height: '72px',
     fontSize: '1.2em',
   },
   mic: {

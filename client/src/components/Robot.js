@@ -12,7 +12,6 @@ function Robot(props) {
     <div>
       <Camera socket={socket} rNum={rNum} />
       <ManualControl socket={socket} rNum={rNum} />
-      <Status socket={socket} rNum={rNum} />
     </div>
   );
 }

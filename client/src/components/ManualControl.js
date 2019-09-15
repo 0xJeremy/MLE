@@ -27,10 +27,6 @@ const useStyles = makeStyles(theme => ({
   end: {
     marginBottom: '40px',
   },
-  record: {
-    height: '45%',
-    fontSize: '1.2em',
-  },
   textField: {
     width: '100%',
   },
