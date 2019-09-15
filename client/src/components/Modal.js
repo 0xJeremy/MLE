@@ -54,7 +54,8 @@ function Modal(props) {
     stopListening();
     setRecordModal(false);
     setLoadingModal(true);
-    socket.emit('speech', transcript)
+    socket.emit('speech', transcript);
+    resetTranscript();
   }
 
   const cancelConfirm = () => {
