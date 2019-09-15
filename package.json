@@ -28,5 +28,7 @@
     "request": "^2.88.0",
     "socket.io": "^2.2.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@google-cloud/language": "^3.2.6"
+  }
 }

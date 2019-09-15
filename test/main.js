@@ -14,6 +14,10 @@ socket.on('search_item', data => {
 	console.log(data);
 });
 
+socket.on('search_item', data => {
+	socket.emit('confirmed_search',`{"response": true}`)
+});
+
 socket.on('image', (data) => {
 	$("#img").attr({
 		"src":"data:image/png;base64,"+data,

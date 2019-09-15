@@ -20,4 +20,8 @@ while(True):
 	ret, frame = cap.read()
 	if count % 2:
 		socket.writeImg(frame)
+		test = socket.get('test');
+		print(test);
+		if(test):
+			print(test);
 	count += 1
