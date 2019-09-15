@@ -17,7 +17,7 @@ function MLE(io, socket, botNum) {
 
 	this.rNum = botNum
 
-	this.searchItem = 'person';
+	this.searchItem = '';
 	this.nav = new RobotNav(botNum);
 	this.nav.setState('STOPPED');
 
@@ -49,10 +49,11 @@ function MLE(io, socket, botNum) {
 		});
 
 		ioSocket.on('confirmItem', (data) => {
-			if(JSON.parse(data)['response'] && !this.godmodeOn){
-				this.nav.setState('SEARCHING');
-				this.report('Rollout!!!');
-			}
+			this.nav.setState('SEARCHING');
+			this.report('Rollout!!!');
+			cmd = this.nav.getCmd();
+			this.report("Sending instruction " + cmd)
+			this.socket.write('instructions', cmd);
 		});
 
 		ioSocket.on('manual'+this.rNum, (data) => {

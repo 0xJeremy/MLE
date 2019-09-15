@@ -34,7 +34,7 @@ function RobotNav(botNum) {
 			return GenRobotInstruct.getStop();
 		}
 		if(this.CURR_STATE == this.STATES.SEARCHING) {
-			cmd = '';
+			var cmd = '';
 			if(this.searchCounter == 0) {
 				cmd = GenRobotInstruct.genForward(SPEED, DURATION);
 			}
