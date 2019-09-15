@@ -50,6 +50,15 @@ function ManualControl(props) {
     setSearchItem({ ...searchItem, [item]: event.target.value });
   };
 
+  function press(direction) {
+    socket.emit('manual', {"direction": direction});
+    console.log("Going " + direction);
+  }
+
+  const forward = () => { press('FORWARD') }
+  const left = () => { press('LEFT') }
+  const right = () => { press('RIGHT') }
+  const back = () => { press('BACK') }
 
   function Row1() {
     return (
@@ -57,7 +66,7 @@ function ManualControl(props) {
         <Grid item xs={4}>
         </Grid>
         <Grid item xs={4}>
-          <Button variant="contained" color="warning" className={classes.button} fullWidth>
+          <Button variant="contained" onClick={forward} color="warning" className={classes.button} fullWidth>
             <ExpandLess />
           </Button>
         </Grid>
@@ -71,14 +80,14 @@ function ManualControl(props) {
     return (
       <React.Fragment>
         <Grid item xs={4}>
-          <Button variant="contained" color="warning" className={classes.button} fullWidth>
+          <Button variant="contained" onClick={left} color="warning" className={classes.button} fullWidth>
             <ChevronLeft />
           </Button>
         </Grid>
         <Grid item xs={4}>
         </Grid>
         <Grid item xs={4}>
-          <Button variant="contained" color="warning" className={classes.button} fullWidth>
+          <Button variant="contained" onClick={right} color="warning" className={classes.button} fullWidth>
             <ChevronRight />
           </Button>
         </Grid>
@@ -86,13 +95,13 @@ function ManualControl(props) {
     );
   }
 
-  function Row3() {
+  function Row3(props) {
     return (
       <React.Fragment>
         <Grid item xs={4}>
         </Grid>
         <Grid item xs={4}>
-          <Button variant="contained" color="warning" className={classes.button} fullWidth>
+          <Button variant="contained" onClick={back} color="warning" className={classes.button} fullWidth>
             <ExpandMore />
           </Button>
         </Grid>
