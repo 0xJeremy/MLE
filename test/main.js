@@ -8,6 +8,12 @@ var h,f,l,d=String.fromCharCode;t.exports={version:"2.1.2",encode:a,decode:u}},f
 
 var socket = io();
 
+socket.emit('search',"I need to find my red bag");
+
+socket.on('search_item', data => {
+	console.log(data);
+});
+
 socket.on('image', (data) => {
 	$("#img").attr({
 		"src":"data:image/png;base64,"+data,
