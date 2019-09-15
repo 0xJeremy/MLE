@@ -8,7 +8,10 @@ const request = require('request');
 
 class Analyzer{
 
-	constructor(){
+	constructor(tmpCallback){
+		this.found = false;
+		this.description = '';
+		this.tmpCallback = tmpCallback;
 	}
 
 	async textAnalysis(data){
@@ -34,9 +37,9 @@ class Analyzer{
 	};
 
 
-	analyzeImage(data){
+	analyzeImage(data, item){
 
-		var search_item = 'bottle';
+		var search_item = item;
 
 		let subscriptionKey = process.env['AZURE_KEY'];
 		let endpoint = process.env['AZURE_ENDPOINT'];
@@ -62,6 +65,9 @@ class Analyzer{
 		    }
 		};
 
+		var description;
+		var found;
+		
 		request.post(options, (error, response, body) => {
 		  if (error) {
 		    console.log('Error: ', error);
@@ -69,20 +75,23 @@ class Analyzer{
 		  }
 
 		  let jsonResponse = JSON.stringify(JSON.parse(body), null, '  ');
-		  console.log('JSON Response\n');
-		  console.log(jsonResponse);
 
 		  var tags=JSON.parse(body)['tags'];
 		  var hi_conf_objects = tags.filter(tag => tag.confidence > .8).map(tag=>tag.name);
-
 		  console.log(hi_conf_objects);
+
+		  this.description = JSON.parse(body)['description']['captions'][0].text;
+
+		  this.found = true;
+
+		  this.tmpCallback(this.description, this.found);
 
 		  if(hi_conf_objects.includes(search_item)){
 		  		console.log("Found a " + search_item);
-		  		return true;
-		  } else return false;
-
-		}); 
+		  		found = true;
+		  }
+		});
+		
 	}
 
 }
