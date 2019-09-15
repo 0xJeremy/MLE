@@ -23,9 +23,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const options = {
+  autoStart: false
+}
 
 function Modal(props) {
   const transcript = props.transcript;
+  const interimTranscript = props.interimTranscript;
   const resetTranscript = props.resetTranscript;
   const startListening = props.startListening;
   const stopListening = props.stopListening;
@@ -53,9 +57,10 @@ function Modal(props) {
   const closeRecord = () => {
     stopListening();
     setRecordModal(false);
-    setLoadingModal(true);
+    console.log(transcript)
     socket.emit('speech', transcript);
     resetTranscript();
+    setLoadingModal(true);
   }
 
   const cancelConfirm = () => {
@@ -96,4 +101,4 @@ function Modal(props) {
   );
 }
 
-export default SpeechRecognition(Modal);
+export default SpeechRecognition(options)(Modal);
