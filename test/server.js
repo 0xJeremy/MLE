@@ -36,6 +36,11 @@ app.use(function (req, res, next) {
 /// FRONT-END ENDPOINTS ///
 ///////////////////////////
 
+
+socket.on('test', data=>{
+	console.log(data);
+});
+
 app.use('/', express.static(__dirname + '/'));
 
 app.get('/', function(req, res) {
