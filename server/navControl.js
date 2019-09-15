@@ -1,7 +1,7 @@
 'use strict';
 const GenRobotInstruct = require('./genRobotInstructions.js');
 
-function RobotNav() {
+function RobotNav(botNum) {
 
 	this.STATES = {
 		STOPPED: 'Stopped',
@@ -10,18 +10,20 @@ function RobotNav() {
 		FOUND: 'Found'
 	}
 
+	this.rNum = botNum;
+
 	this.CURR_STATE = this.STATES.STOPPED;
 
-	this.error = false;
-
-
 	this.history = [];
-
 	this.searchCounter = 0;
+
+	this.report = function(message) {
+		console.log('Bot ' + this.rNum + ': ' + message);
+	}
 
 	this.setState = function(state) {
 		this.CURR_STATE = this.STATES[state];
-		console.log("Nav State set to " + this.CURR_STATE);
+		this.report("Nav State set to " + this.CURR_STATE);
 	}
 
 	this.getCmd = function() {

@@ -8,12 +8,14 @@ const RobotNav = require('./navControl.js');
 const GodMode = require('./god.js');
 
 
-function MLE(io, socket) {
+function MLE(io, socket, botNum) {
 	this.socket = socket;
 	this.io = io;
 
+	this.rNum = botNum
+
 	this.search_item = 'person';
-	this.nav = new RobotNav(socket);
+	this.nav = new RobotNav(botNum);
 	this.nav.setState('STOPPED')
 
 	this.godmode = new GodMode(io, socket);
@@ -24,32 +26,33 @@ function MLE(io, socket) {
 
 	this.waiting = false
 
-
-	this.startFlow = function(){
-		this.io.on('connection', (ioSocket) => {
-
-			ioSocket.on('speech', (data) => {
-				this.analyzer.textAnalysis(data)
-					.then(item => {
-						this.search_item = item;
-						ioSocket.emit('searchItem',item);
-					})
-					.catch(console.error);
-			});
-
-			ioSocket.on('confirmItem', (data) => {
-				this.beginSearch();
-				if(JSON.parse(data)['response'] && !this.godmodeOn){
-					this.nav.setState('SEARCHING');
-					console.log('Rollout!!!');
-				}
-
-			});
-		});
+	this.report = function(message) {
+		console.log('Bot ' + this.rNum + ': ' + message);
 	}
 
+
+	this.io.on('connection', (ioSocket) => {
+
+		ioSocket.on('speech', (data) => {
+			this.analyzer.textAnalysis(data)
+				.then(item => {
+					this.search_item = item;
+					ioSocket.emit('searchItem',item);
+				})
+				.catch(console.error);
+		});
+
+		ioSocket.on('confirmItem', (data) => {
+			this.beginSearch();
+			if(JSON.parse(data)['response'] && !this.godmodeOn){
+				this.nav.setState('SEARCHING');
+				console.log('Rollout!!!');
+			}
+		});
+	});
+
 	this.socket.on('image', (data) => {
-	 	this.io.emit('image', data);
+	 	this.io.emit('image'+this.rNum, data);
 				
 	 	if(!this.waiting){
 	 		this.waiting = true;
@@ -78,7 +81,7 @@ function MLE(io, socket) {
 
 			request.post(options, (error, response, body) => {
 			  if (error) {
-			    console.log('Error: ', error);
+			    this.report('Error: ', error);
 			    return;
 			  }
 
@@ -86,12 +89,12 @@ function MLE(io, socket) {
 
 			  var tags=JSON.parse(body)['tags'];
 			  var hi_conf_objects = tags.filter(tag => tag.confidence > .8).map(tag=>tag.name);
-			  console.log(hi_conf_objects);
+			  this.report(hi_conf_objects);
 
 			  this.description = JSON.parse(body)['description']['captions'][0].text;
 
 			  if(hi_conf_objects.includes(this.search_item)){
-			  		console.log("Found a " + this.search_item);
+			  		this.report("Found a " + this.search_item);
 			  		this.found = true;
 			  		this.nav.setState('FOUND')
 		  			this.finale();
@@ -104,9 +107,9 @@ function MLE(io, socket) {
 
 	this.socket.on('cmdAck', (data) => {
 		cmd = this.nav.getCmd();
-		console.log("Sending instruction " + cmd)
+		this.report("Sending instruction " + cmd)
 		this.socket.write('instruction', cmd);
-	})
+	});
 
 	this.actiavteGM = function(){
 		this.godmode.godControl();
@@ -114,7 +117,7 @@ function MLE(io, socket) {
 	}
 
 	this.finale = function(){
-		console.log('Done!');
+		this.report('Done!');
 	}
 
 }

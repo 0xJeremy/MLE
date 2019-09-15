@@ -42,8 +42,8 @@ function ManualControl(props) {
     item: '// not currently searching //',
   });
 
-  socket.on('newItem', (data) => {
-    setSearchItem(data);
+  socket.on('searchItem', (data) => {
+    setSearchItem({item: data});
   });
 
   const handleChange = item => event => {
@@ -126,7 +126,7 @@ function ManualControl(props) {
             <TextField id="outlined-name" label="Search Item" className={classes.textField} 
               value={searchItem.item} onChange={handleChange('item')} 
               margin="normal" variant="outlined" />
-            <Modal socket={socket}/>
+            <Modal socket={socket} />
           </Grid>
 
           <Grid item xs={6} sm={6}>

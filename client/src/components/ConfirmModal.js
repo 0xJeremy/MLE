@@ -33,10 +33,10 @@ const useStyles = makeStyles(theme => ({
     height: '80px'
   },
   prompt: {
-    fontSize: '2em'
+    fontSize: '1.5em'
   },
   search: {
-    color: ''
+    fontSize: '2em'
   }
 }));
 
