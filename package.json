@@ -23,7 +23,7 @@
   "homepage": "https://github.com/0bLondon/HackMIT2019#readme",
   "devDependencies": {
     "concurrently": "^4.1.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fireeye": "^0.5.0",
     "request": "^2.88.0",
     "socket.io": "^2.4.0"
